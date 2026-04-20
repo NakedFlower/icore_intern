@@ -2,21 +2,20 @@ import requests
 import json
 from datetime import datetime, timedelta
 
-# 1. 경환 님이 제공해주신 실제 정보 적용
 # 주의: 브라우저에서 'Unexpected errors'가 났다면 Decoding 키 대신 Encoding 키를 넣어보세요.
-SERVICE_KEY = "c931063a6a78de90174a145888564cfba283d12ade1701a9edf1abd2225abe7a"
-SLACK_WEBHOOK_URL = "https://hooks.slack.com/services/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"
+SERVICE_KEY = ""
+SLACK_WEBHOOK_URL = ""
 
 # 아이코어 인턴 업무용 키워드
 KEYWORDS = ["인공지능", "AI", "데이터", "클라우드", "소프트웨어"]
 
 def get_g2b_data():
-    # 경환 님의 API 명세에 적힌 정확한 엔드포인트 (2번: 용역조회)
+    # API 명세에 적힌 정확한 엔드포인트 (2번: 용역조회)
     base_url = "https://apis.data.go.kr/1230000/ad/BidPublicInfoService/getBidPblancListInfoServc"
     
     # 날짜 설정
     now = datetime.now()
-    yesterday = now - timedelta(days=7) # 테스트를 위해 7일치로 범위를 넓혀볼게요
+    yesterday = now - timedelta(days=7)
     
     params = {
         'serviceKey': SERVICE_KEY,
@@ -48,7 +47,7 @@ def get_g2b_data():
 
 def send_to_slack(title, org, link):
     payload = {
-        "text": f"📢 *[아이코어] 신규 입찰 공고 발견*",
+        "text": f"*[아이코어] 신규 입찰 공고 발견*",
         "attachments": [{
             "color": "#36a64f",
             "fields": [
@@ -65,7 +64,7 @@ def send_to_slack(title, org, link):
     requests.post(SLACK_WEBHOOK_URL, json=payload)
 
 if __name__ == "__main__":
-    print("🔍 조달청 용역 공고 수집 시작...")
+    print("조달청 용역 공고 수집 시작...")
     items = get_g2b_data()
     
     match_count = 0
@@ -76,7 +75,7 @@ if __name__ == "__main__":
                 org = item.get('ntceInsttNm', '알 수 없음')
                 link = item.get('bidNtceDtlUrl', '#')
                 send_to_slack(title, org, link)
-                print(f"✅ 매칭: {title}")
+                print(f"매칭: {title}")
                 match_count += 1
     
-    print(f"🏁 완료! {match_count}건 전송됨.")
+    print(f"완료! {match_count}건 전송됨.")
